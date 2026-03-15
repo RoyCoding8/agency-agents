@@ -94,6 +94,16 @@ function Write-Utf8File {
   [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
 }
 
+function Write-ToolArtifact {
+  param(
+    [string]$RelativePath,
+    [string]$Content
+  )
+
+  $outPath = Join-Path $OutDir $RelativePath
+  Write-Utf8File -Path $outPath -Content $Content
+}
+
 function Read-Utf8Lines {
   param([string]$Path)
 
@@ -263,8 +273,7 @@ function Convert-Antigravity {
   param([pscustomobject]$Agent)
 
   $slug = "agency-$(Slugify -Value $Agent.Name)"
-  $outDir = Join-Path (Join-Path $OutDir "antigravity") $slug
-  $outFile = Join-Path $outDir "SKILL.md"
+  $relativePath = Join-Path (Join-Path "antigravity" $slug) "SKILL.md"
 
   $content = @"
 ---
@@ -277,15 +286,14 @@ date_added: '$Today'
 $($Agent.Body)
 "@
 
-  Write-Utf8File -Path $outFile -Content $content
+  Write-ToolArtifact -RelativePath $relativePath -Content $content
 }
 
 function Convert-GeminiCli {
   param([pscustomobject]$Agent)
 
   $slug = Slugify -Value $Agent.Name
-  $outDir = Join-Path (Join-Path (Join-Path $OutDir "gemini-cli") "skills") $slug
-  $outFile = Join-Path $outDir "SKILL.md"
+  $relativePath = Join-Path (Join-Path (Join-Path "gemini-cli" "skills") $slug) "SKILL.md"
 
   $content = @"
 ---
@@ -295,7 +303,7 @@ description: $($Agent.Description)
 $($Agent.Body)
 "@
 
-  Write-Utf8File -Path $outFile -Content $content
+  Write-ToolArtifact -RelativePath $relativePath -Content $content
 }
 
 function Convert-OpenCode {
@@ -303,7 +311,7 @@ function Convert-OpenCode {
 
   $slug = Slugify -Value $Agent.Name
   $color = Resolve-OpenCodeColor -Color $Agent.Color
-  $outFile = Join-Path (Join-Path (Join-Path $OutDir "opencode") "agents") "$slug.md"
+  $relativePath = Join-Path (Join-Path "opencode" "agents") "$slug.md"
 
   $content = @"
 ---
@@ -315,14 +323,14 @@ color: '$color'
 $($Agent.Body)
 "@
 
-  Write-Utf8File -Path $outFile -Content $content
+  Write-ToolArtifact -RelativePath $relativePath -Content $content
 }
 
 function Convert-Cursor {
   param([pscustomobject]$Agent)
 
   $slug = Slugify -Value $Agent.Name
-  $outFile = Join-Path (Join-Path (Join-Path $OutDir "cursor") "rules") "$slug.mdc"
+  $relativePath = Join-Path (Join-Path "cursor" "rules") "$slug.mdc"
 
   $content = @"
 ---
@@ -333,7 +341,7 @@ alwaysApply: false
 $($Agent.Body)
 "@
 
-  Write-Utf8File -Path $outFile -Content $content
+  Write-ToolArtifact -RelativePath $relativePath -Content $content
 }
 
 function Split-OpenClawBody {
@@ -422,7 +430,7 @@ function Convert-Qwen {
   param([pscustomobject]$Agent)
 
   $slug = Slugify -Value $Agent.Name
-  $outFile = Join-Path (Join-Path (Join-Path $OutDir "qwen") "agents") "$slug.md"
+  $relativePath = Join-Path (Join-Path "qwen" "agents") "$slug.md"
 
   if (-not [string]::IsNullOrWhiteSpace($Agent.Tools)) {
     $content = @"
@@ -444,7 +452,7 @@ $($Agent.Body)
 "@
   }
 
-  Write-Utf8File -Path $outFile -Content $content
+  Write-ToolArtifact -RelativePath $relativePath -Content $content
 }
 
 function Accumulate-Aider {
@@ -524,22 +532,18 @@ function Run-Conversions {
 }
 
 function Write-GeminiManifest {
-  $manifestPath = Join-Path (Join-Path $OutDir "gemini-cli") "gemini-extension.json"
   $manifest = @'
 {
   "name": "agency-agents",
   "version": "1.0.0"
 }
 '@
-  Write-Utf8File -Path $manifestPath -Content $manifest
+  Write-ToolArtifact -RelativePath (Join-Path "gemini-cli" "gemini-extension.json") -Content $manifest
 }
 
 function Write-SingleFileOutputs {
-  $aiderPath = Join-Path (Join-Path $OutDir "aider") "CONVENTIONS.md"
-  $windsurfPath = Join-Path (Join-Path $OutDir "windsurf") ".windsurfrules"
-
-  Write-Utf8File -Path $aiderPath -Content $Script:AiderAccumulator.ToString()
-  Write-Utf8File -Path $windsurfPath -Content $Script:WindsurfAccumulator.ToString()
+  Write-ToolArtifact -RelativePath (Join-Path "aider" "CONVENTIONS.md") -Content $Script:AiderAccumulator.ToString()
+  Write-ToolArtifact -RelativePath (Join-Path "windsurf" ".windsurfrules") -Content $Script:WindsurfAccumulator.ToString()
 }
 
 if ($Help) {

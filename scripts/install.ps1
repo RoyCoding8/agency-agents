@@ -115,6 +115,49 @@ function Ensure-Directory {
   }
 }
 
+function Copy-FlatFiles {
+  param(
+    [string]$Source,
+    [string]$Filter,
+    [string]$Destination
+  )
+
+  Ensure-Directory -Path $Destination
+
+  $count = 0
+  $files = Get-ChildItem -Path $Source -Filter $Filter -File | Sort-Object -Property Name
+  foreach ($file in $files) {
+    Copy-Item -Path $file.FullName -Destination $Destination -Force
+    $count++
+  }
+
+  return $count
+}
+
+function Install-SingleProjectFile {
+  param(
+    [string]$Source,
+    [string]$MissingMessage,
+    [string]$Destination,
+    [string]$ExistsWarning,
+    [string]$SuccessMessage,
+    [string]$ScopeWarning
+  )
+
+  if (-not (Test-Path -Path $Source -PathType Leaf)) {
+    throw $MissingMessage
+  }
+
+  if (Test-Path -Path $Destination -PathType Leaf) {
+    Write-WarnMsg $ExistsWarning
+    return
+  }
+
+  Copy-Item -Path $Source -Destination $Destination -Force
+  Write-Ok $SuccessMessage
+  Write-WarnMsg $ScopeWarning
+}
+
 function Read-Utf8FirstLine {
   param([string]$Path)
 
@@ -369,14 +412,7 @@ function Install-OpenCode {
   }
 
   $dest = Join-Path (Get-Location).Path ".opencode\agents"
-  Ensure-Directory -Path $dest
-
-  $count = 0
-  $files = Get-ChildItem -Path $src -Filter "*.md" -File | Sort-Object -Property Name
-  foreach ($file in $files) {
-    Copy-Item -Path $file.FullName -Destination $dest -Force
-    $count++
-  }
+  $count = Copy-FlatFiles -Source $src -Filter "*.md" -Destination $dest
 
   Write-Ok "OpenCode: $count agents -> $dest"
   Write-WarnMsg "OpenCode: project-scoped. Run from your project root to install there."
@@ -436,14 +472,7 @@ function Install-Cursor {
   }
 
   $dest = Join-Path (Get-Location).Path ".cursor\rules"
-  Ensure-Directory -Path $dest
-
-  $count = 0
-  $files = Get-ChildItem -Path $src -Filter "*.mdc" -File | Sort-Object -Property Name
-  foreach ($file in $files) {
-    Copy-Item -Path $file.FullName -Destination $dest -Force
-    $count++
-  }
+  $count = Copy-FlatFiles -Source $src -Filter "*.mdc" -Destination $dest
 
   Write-Ok "Cursor: $count rules -> $dest"
   Write-WarnMsg "Cursor: project-scoped. Run from your project root to install there."
@@ -453,38 +482,28 @@ function Install-Aider {
   param([string]$Integrations)
 
   $src = Join-Path (Join-Path $Integrations "aider") "CONVENTIONS.md"
-  if (-not (Test-Path -Path $src -PathType Leaf)) {
-    throw "integrations/aider/CONVENTIONS.md missing. Run convert.sh or convert.ps1 first."
-  }
-
   $dest = Join-Path (Get-Location).Path "CONVENTIONS.md"
-  if (Test-Path -Path $dest -PathType Leaf) {
-    Write-WarnMsg "Aider: CONVENTIONS.md already exists at $dest (remove to reinstall)."
-    return
-  }
-
-  Copy-Item -Path $src -Destination $dest -Force
-  Write-Ok "Aider: installed -> $dest"
-  Write-WarnMsg "Aider: project-scoped. Run from your project root to install there."
+  Install-SingleProjectFile `
+    -Source $src `
+    -MissingMessage "integrations/aider/CONVENTIONS.md missing. Run convert.sh or convert.ps1 first." `
+    -Destination $dest `
+    -ExistsWarning "Aider: CONVENTIONS.md already exists at $dest (remove to reinstall)." `
+    -SuccessMessage "Aider: installed -> $dest" `
+    -ScopeWarning "Aider: project-scoped. Run from your project root to install there."
 }
 
 function Install-Windsurf {
   param([string]$Integrations)
 
   $src = Join-Path (Join-Path $Integrations "windsurf") ".windsurfrules"
-  if (-not (Test-Path -Path $src -PathType Leaf)) {
-    throw "integrations/windsurf/.windsurfrules missing. Run convert.sh or convert.ps1 first."
-  }
-
   $dest = Join-Path (Get-Location).Path ".windsurfrules"
-  if (Test-Path -Path $dest -PathType Leaf) {
-    Write-WarnMsg "Windsurf: .windsurfrules already exists at $dest (remove to reinstall)."
-    return
-  }
-
-  Copy-Item -Path $src -Destination $dest -Force
-  Write-Ok "Windsurf: installed -> $dest"
-  Write-WarnMsg "Windsurf: project-scoped. Run from your project root to install there."
+  Install-SingleProjectFile `
+    -Source $src `
+    -MissingMessage "integrations/windsurf/.windsurfrules missing. Run convert.sh or convert.ps1 first." `
+    -Destination $dest `
+    -ExistsWarning "Windsurf: .windsurfrules already exists at $dest (remove to reinstall)." `
+    -SuccessMessage "Windsurf: installed -> $dest" `
+    -ScopeWarning "Windsurf: project-scoped. Run from your project root to install there."
 }
 
 function Install-Qwen {
@@ -496,14 +515,7 @@ function Install-Qwen {
   }
 
   $dest = Join-Path (Get-Location).Path ".qwen\agents"
-  Ensure-Directory -Path $dest
-
-  $count = 0
-  $files = Get-ChildItem -Path $src -Filter "*.md" -File | Sort-Object -Property Name
-  foreach ($file in $files) {
-    Copy-Item -Path $file.FullName -Destination $dest -Force
-    $count++
-  }
+  $count = Copy-FlatFiles -Source $src -Filter "*.md" -Destination $dest
 
   Write-Ok "Qwen Code: installed $count agents to $dest"
   Write-WarnMsg "Qwen Code: project-scoped. Run from your project root to install there."
