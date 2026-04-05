@@ -15,6 +15,7 @@ supported agentic coding tools.
 - **[Aider](#aider)** — `CONVENTIONS.md` in `aider/`
 - **[Windsurf](#windsurf)** — `.windsurfrules` in `windsurf/`
 - **[Qwen Code](#qwen-code)** — SubAgent `.md` files in `qwen/`
+- **[Kimi Code](#kimi-code)** — YAML agent specs in `kimi/`
 
 ## Quick Install
 
@@ -188,3 +189,36 @@ cd /your/project && /path/to/agency-agents/scripts/convert.sh --tool qwen && /pa
 ```
 
 See [../README.md#tool-specific-instructions](../README.md#tool-specific-instructions) for usage details.
+
+---
+
+## Kimi Code
+
+Each agent is converted to a Kimi Code CLI agent specification (YAML format with
+separate system prompt files). Agents are installed to `~/.config/kimi/agents/`.
+
+Because the Kimi agent files are generated from the source Markdown, run
+`./scripts/convert.sh --tool kimi` before installing from a fresh clone.
+
+```bash
+./scripts/convert.sh --tool kimi
+./scripts/install.sh --tool kimi
+```
+
+### Usage
+
+After installation, use an agent with the `--agent-file` flag:
+
+```bash
+kimi --agent-file ~/.config/kimi/agents/frontend-developer/agent.yaml
+```
+
+Or in a specific project:
+
+```bash
+cd /your/project
+kimi --agent-file ~/.config/kimi/agents/frontend-developer/agent.yaml \
+     --work-dir /your/project
+```
+
+See [kimi/README.md](kimi/README.md) for details.
