@@ -497,7 +497,7 @@ Each agent is designed with:
 
 ## 📊 Stats
 
-- 🎭 **144 Specialized Agents** across 12 divisions
+- 🎭 **162 Specialized Agents** across 13 divisions
 - 📝 **10,000+ lines** of personality, process, and code examples
 - ⏱️ **Months of iteration** from real-world usage
 - 🌟 **Battle-tested** in production environments
@@ -906,7 +906,7 @@ MIT License - Use freely, commercially or personally. Attribution appreciated bu
 
 ## 🙏 Acknowledgments
 
-What started as a Reddit thread about AI agent specialization has grown into something remarkable — **147 agents across 12 divisions**, supported by a community of contributors from around the world. Every agent in this repo exists because someone cared enough to write it, test it, and share it.
+What started as a Reddit thread about AI agent specialization has grown into something remarkable — **162 agents across 13 divisions**, supported by a community of contributors from around the world. Every agent in this repo exists because someone cared enough to write it, test it, and share it.
 
 To everyone who has opened a PR, filed an issue, started a Discussion, or simply tried an agent and told us what worked — thank you. You're the reason The Agency keeps getting better.
 
