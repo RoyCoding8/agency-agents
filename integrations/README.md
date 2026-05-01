@@ -16,6 +16,7 @@ supported agentic coding tools.
 - **[Windsurf](#windsurf)** — `.windsurfrules` in `windsurf/`
 - **[Qwen Code](#qwen-code)** — SubAgent `.md` files in `qwen/`
 - **[Kimi Code](#kimi-code)** — YAML agent specs in `kimi/`
+- **[Qwen Code](#qwen-code)** — project-scoped `.md` SubAgents in `.qwen/agents/`
 
 ## Quick Install
 
@@ -32,11 +33,19 @@ supported agentic coding tools.
 # Gemini CLI needs generated integration files on a fresh clone
 ./scripts/convert.sh --tool gemini-cli
 ./scripts/install.sh --tool gemini-cli
+
+# Qwen Code also needs generated SubAgent files on a fresh clone
+./scripts/convert.sh --tool qwen
+./scripts/install.sh --tool qwen
+```
+If you install OpenClaw and the gateway is already running, restart it after installation:
+
+```bash
+openclaw gateway restart
 ```
 
-Windows examples are in the main README under [Tool-Specific Instructions](../README.md#tool-specific-instructions).
-
-For project-scoped tools such as OpenCode, Cursor, Aider, Windsurf, and Qwen, run
+For project-scoped tools such as OpenCode, Cursor, Aider, Windsurf, and Qwen
+Code, run
 the installer from your target project root as shown in the tool-specific
 sections below.
 
@@ -222,3 +231,23 @@ kimi --agent-file ~/.config/kimi/agents/frontend-developer/agent.yaml \
 ```
 
 See [kimi/README.md](kimi/README.md) for details.
+
+---
+
+## Qwen Code
+
+Each agent becomes a project-scoped `.md` SubAgent file in `.qwen/agents/`.
+
+From a fresh clone, generate the Qwen files first:
+
+```bash
+./scripts/convert.sh --tool qwen
+```
+
+Then install them from your project root:
+
+```bash
+cd /your/project && /path/to/agency-agents/scripts/install.sh --tool qwen
+```
+
+See [qwen/README.md](qwen/README.md) for details.
